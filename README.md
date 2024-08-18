@@ -11,10 +11,10 @@
 Install
 ```bash
 # Storage
-go get -u github.com/gflydev/storage@v1.0.0
+go get -u github.com/gflydev/storage@v1.0.1
 
 # Local Storage
-go get -u github.com/gflydev/storage/local@v1.0.0
+go get -u github.com/gflydev/storage/local@v1.0.1
 ```
 
 Quick usage `main.go`
