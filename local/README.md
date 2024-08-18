@@ -1,4 +1,4 @@
-# gFly Storage
+# gFly Local Storage
 
 ### Usage
 
