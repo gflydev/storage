@@ -2,15 +2,13 @@ module github.com/gflydev/storage/s3
 
 go 1.22.6
 
-replace github.com/gflydev/storage => ../
-
 require (
 	github.com/aws/aws-sdk-go-v2 v1.30.4
 	github.com/aws/aws-sdk-go-v2/config v1.27.30
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.60.1
 	github.com/gflydev/core v1.9.0
-	github.com/gflydev/storage v1.0.1
-	github.com/gflydev/storage/local v1.0.1
+	github.com/gflydev/storage v1.1.0
+	github.com/gflydev/storage/local v1.1.0
 )
 
 require (

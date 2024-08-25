@@ -5,10 +5,10 @@
 Install
 ```bash
 # Storage
-go get -u github.com/gflydev/storage@v1.0.1
+go get -u github.com/gflydev/storage@v1.1.0
 
 # S3 Storage
-go get -u github.com/gflydev/storage/s3@v1.0.0
+go get -u github.com/gflydev/storage/s3@v1.1.0
 ```
 
 Quick usage `main.go`
