@@ -2,7 +2,10 @@ module github.com/gflydev/storage/local
 
 go 1.22.6
 
-require github.com/gflydev/core v1.8.0
+replace github.com/gflydev/storage => ../
+
+require github.com/gflydev/core v1.9.0
+
 require github.com/gflydev/storage v1.0.1
 
 require (

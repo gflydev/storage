@@ -8,5 +8,5 @@ import "github.com/gflydev/storage"
 
 // Auto initial local storage and register to storage manager
 func init() {
-	storage.Register(string(Type), New())
+	storage.Register(Type, New())
 }

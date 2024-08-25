@@ -2,7 +2,7 @@ module github.com/gflydev/storage
 
 go 1.22.6
 
-require github.com/gflydev/core v1.8.0
+require github.com/gflydev/core v1.9.0
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect

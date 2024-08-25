@@ -34,7 +34,7 @@ var (
 )
 
 // New Create S3 Storage with basics info.
-func New() *S3Storage {
+func New() *Storage {
 	// Load the Shared AWS Configuration (~/.aws/config). Note: Also load combine .env file.
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
@@ -42,12 +42,12 @@ func New() *S3Storage {
 	}
 
 	// Create an Amazon S3 service client
-	return &S3Storage{
+	return &Storage{
 		S3Client: s3.NewFromConfig(cfg),
 	}
 }
 
-type S3Storage struct {
+type Storage struct {
 	S3Client *s3.Client
 }
 
@@ -55,7 +55,7 @@ type S3Storage struct {
 // 									Implement IStorage
 // ========================================================================================
 
-func (s *S3Storage) Put(path, contents string, options ...interface{}) bool {
+func (s *Storage) Put(path, contents string) bool {
 	localStorage := local.New()
 
 	// Put content to temporary dir at local.
@@ -78,10 +78,37 @@ func (s *S3Storage) Put(path, contents string, options ...interface{}) bool {
 		}
 	}(file)
 
-	return s.PutFile(path, file, options)
+	return s.PutFile(path, file)
 }
 
-func (s *S3Storage) PutFile(path string, fileSource *os.File, options ...interface{}) bool {
+// PutData Create file by content
+func (s *Storage) PutData(path string, contents []byte) bool {
+	localStorage := local.New()
+
+	// Put content to temporary dir at local.
+	fileName := filepath.Base(path)
+	tempPath := fmt.Sprintf("%s/%s", core.TempDir, fileName)
+	localStorage.PutData(tempPath, contents)
+
+	// Open file source
+	file, err := os.Open(filepath.Clean(tempPath))
+	if err != nil {
+		log.Errorf("Unable create file %q. Here's why: %v\n", tempPath, err)
+
+		return false
+	}
+
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Errorf("Unable to close file %q. Here's why: %v\n", tempPath, err)
+		}
+	}(file)
+
+	return s.PutFile(path, file)
+}
+
+func (s *Storage) PutFile(path string, fileSource *os.File) bool {
 	_, err := s.S3Client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -96,7 +123,7 @@ func (s *S3Storage) PutFile(path string, fileSource *os.File, options ...interfa
 	return true
 }
 
-func (s *S3Storage) PutFilepath(path, filePath string, options ...interface{}) bool {
+func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) bool {
 	fileSource, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Errorf("Unable to read file %q. Here's why: %v\n", filePath, err)
@@ -118,7 +145,7 @@ func (s *S3Storage) PutFilepath(path, filePath string, options ...interface{}) b
 	return true
 }
 
-func (s *S3Storage) Delete(path string) bool {
+func (s *Storage) Delete(path string) bool {
 	_, err := s.S3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -132,7 +159,7 @@ func (s *S3Storage) Delete(path string) bool {
 	return true
 }
 
-func (s *S3Storage) Copy(from, to string) bool {
+func (s *Storage) Copy(from, to string) bool {
 	_, err := s.S3Client.CopyObject(context.TODO(), &s3.CopyObjectInput{
 		Bucket:     aws.String(bucket),
 		CopySource: aws.String(fmt.Sprintf("%s/%s", bucket, from)),
@@ -147,7 +174,7 @@ func (s *S3Storage) Copy(from, to string) bool {
 	return true
 }
 
-func (s *S3Storage) Move(from, to string) bool {
+func (s *Storage) Move(from, to string) bool {
 	if s.Copy(from, to) {
 		return s.Delete(from)
 	}
@@ -155,10 +182,10 @@ func (s *S3Storage) Move(from, to string) bool {
 	return false
 }
 
-func (s *S3Storage) Exists(path string) bool {
+func (s *Storage) Exists(path string) bool {
 	return s.Size(path) != 0
 }
-func (s *S3Storage) Get(path string) ([]byte, error) {
+func (s *Storage) Get(path string) ([]byte, error) {
 	result, err := s.getObject(path)
 
 	if err != nil {
@@ -180,7 +207,7 @@ func (s *S3Storage) Get(path string) ([]byte, error) {
 	return body, nil
 }
 
-func (s *S3Storage) Size(path string) int64 {
+func (s *Storage) Size(path string) int64 {
 	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -195,7 +222,7 @@ func (s *S3Storage) Size(path string) int64 {
 	return *result.ObjectSize
 }
 
-func (s *S3Storage) LastModified(path string) time.Time {
+func (s *Storage) LastModified(path string) time.Time {
 	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -217,7 +244,7 @@ func (s *S3Storage) LastModified(path string) time.Time {
 //
 //	Pattern URL (Use it) `https://<bucket-name>.s3.<region>.amazonaws.com/<key>`
 //	Pattern URL `https://<region>.amazonaws.com/<bucket-name>/<key>`
-func (s *S3Storage) Url(path string) string {
+func (s *Storage) Url(path string) string {
 	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
 		bucket,
 		region,
@@ -225,11 +252,11 @@ func (s *S3Storage) Url(path string) string {
 	)
 }
 
-func (s *S3Storage) MakeDir(dir string) bool {
+func (s *Storage) MakeDir(dir string) bool {
 	return s.Put(fmt.Sprintf("%s/.info", dir), "Info")
 }
 
-func (s *S3Storage) DeleteDir(dir string) bool {
+func (s *Storage) DeleteDir(dir string) bool {
 	// Get all objects in dir
 	// Note: Can not delete a dir have children object.
 	result, err := s.S3Client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
@@ -268,13 +295,13 @@ func (s *S3Storage) DeleteDir(dir string) bool {
 	return true
 }
 
-func (s *S3Storage) Append(path, data string) bool {
+func (s *Storage) Append(path, data string) bool {
 	log.Errorf("Unable to append data %s into %s. Here's why: %v\n", path, data, errors.NotYetImplemented.Error())
 
 	return false
 }
 
-func (s *S3Storage) getObject(path string) (*s3.GetObjectOutput, error) {
+func (s *Storage) getObject(path string) (*s3.GetObjectOutput, error) {
 	result, err := s.S3Client.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
