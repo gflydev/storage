@@ -16,11 +16,13 @@ Quick usage `main.go`
 import (
     "github.com/gflydev/core"
     "github.com/gflydev/storage"
-    // Auto initial S3 storage
-    _ "github.com/gflydev/storage/s3"	
+    storageS3 "github.com/gflydev/storage/s3"	
 )
 
 func main() {
+    // Register S3 storage
+    storage.Register(storageS3.Type, storageS3.New())
+
     // Create S3 storage with default
     fs := storage.Instance(strin(s3.Type))
 

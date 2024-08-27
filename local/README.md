@@ -16,11 +16,13 @@ Quick usage `main.go`
 import (
     "github.com/gflydev/core"
     "github.com/gflydev/storage"
-    // Auto initial local storage
-    _ "github.com/gflydev/storage/local"	
+    storageLocal "github.com/gflydev/storage/local"	
 )
 
 func main() {
+    // Register Local storage
+    storage.Register(storageLocal.Type, storageLocal.New())
+
     // Create file storage with default
     fs := storage.Instance()
 
