@@ -5,6 +5,7 @@ import (
 	"github.com/gflydev/core"
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
+	"github.com/gflydev/storage/s3"
 	_ "github.com/gflydev/storage/s3"
 	"github.com/gflydev/view/pongo"
 )
@@ -44,7 +45,7 @@ type HomePage struct {
 }
 
 func (m *HomePage) Handle(c *core.Ctx) error {
-	fs := storage.Instance()
+	fs := storage.Instance(s3.Type)
 
 	if ok := fs.MakeDir("one/two"); ok {
 		fs.Put("one/two/hello.txt", "Hello world")
@@ -57,7 +58,7 @@ func (m *HomePage) Handle(c *core.Ctx) error {
 //                                     Routers
 // =========================================================================================
 
-func router(g core.IFlyRouter) {
+func router(g core.IFly) {
 	prefixAPI := fmt.Sprintf(
 		"/%s/%s",
 		utils.Getenv("API_PREFIX", "api"),
