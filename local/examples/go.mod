@@ -2,12 +2,10 @@ module examples
 
 go 1.22.6
 
-replace github.com/gflydev/storage/local => ../
-
 require (
 	github.com/gflydev/core v1.10.6
 	github.com/gflydev/storage v1.1.1
-	github.com/gflydev/storage/local v1.1.0
+	github.com/gflydev/storage/local v1.1.1
 	github.com/gflydev/view/pongo v1.0.2
 )
 
