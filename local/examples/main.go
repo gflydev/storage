@@ -84,6 +84,9 @@ func main() {
 	// Register view
 	core.RegisterView(pongo.New())
 
+	// Register Local storage
+	storage.Register(local.Type, local.New())
+
 	// Register router
 	app.RegisterRouter(router)
 

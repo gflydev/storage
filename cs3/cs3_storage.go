@@ -1,4 +1,4 @@
-package s3
+package cs3
 
 import (
 	"context"
@@ -26,14 +26,16 @@ import (
 // ========================================================================================
 
 const (
-	Type = storage.Type("s3")
+	Type = storage.Type("cs3")
 )
 
 var (
-	accessKey = utils.Getenv("AWS_ACCESS_KEY_ID", "")
-	secretKey = utils.Getenv("AWS_SECRET_ACCESS_KEY", "")
-	region    = utils.Getenv("AWS_S3_REGION", "")
-	bucket    = utils.Getenv("AWS_S3_BUCKET", "")
+	accessKey  = utils.Getenv("CS_ACCESS_KEY_ID", "")
+	secretKey  = utils.Getenv("CS_SECRET_ACCESS_KEY", "")
+	region     = utils.Getenv("CS_REGION", "")
+	bucket     = utils.Getenv("CS_BUCKET", "")
+	bucketCode = utils.Getenv("CS_BUCKET_CODE", "")
+	endPoint   = utils.Getenv("CS_ENDPOINT", "https://sin1.contabostorage.com")
 )
 
 // New Create S3 Storage with basics info.
@@ -44,6 +46,7 @@ func New() *Storage {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithCredentialsProvider(creds),
 		config.WithRegion(region),
+		config.WithBaseEndpoint(endPoint),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -51,7 +54,9 @@ func New() *Storage {
 
 	// Create an Amazon S3 service client
 	return &Storage{
-		S3Client: s3.NewFromConfig(cfg),
+		S3Client: s3.NewFromConfig(cfg, func(o *s3.Options) {
+			o.UsePathStyle = true
+		}),
 	}
 }
 
@@ -122,6 +127,7 @@ func (s *Storage) PutFile(path string, fileSource *os.File) bool {
 		Key:    aws.String(path),
 		Body:   fileSource,
 	})
+
 	if err != nil {
 		log.Errorf("Unable to write file %q. Here's why: %v\n", path, err)
 
@@ -249,13 +255,12 @@ func (s *Storage) LastModified(path string) time.Time {
 }
 
 // Url Get public URL of an object via path
-//
-//	Pattern URL (Use it) `https://<bucket-name>.s3.<region>.amazonaws.com/<key>`
-//	Pattern URL `https://<region>.amazonaws.com/<bucket-name>/<key>`
+// Pattern URL `https://<region>.contabostorage.com/<bucket_code>:<bucket>/<key>`
 func (s *Storage) Url(path string) string {
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
-		bucket,
+	return fmt.Sprintf("https://%s.contabostorage.com/%s:%s/%s",
 		region,
+		bucketCode,
+		bucket,
 		strings.TrimPrefix(filepath.ToSlash(path), "/"),
 	)
 }

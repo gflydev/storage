@@ -1,4 +1,4 @@
-module github.com/gflydev/storage/s3
+module github.com/gflydev/storage/cs3
 
 go 1.22.6
 
