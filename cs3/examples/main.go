@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gflydev/core"
+	"github.com/gflydev/core/log"
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
 	"github.com/gflydev/storage/cs3"
@@ -46,14 +47,41 @@ type HomePage struct {
 }
 
 func (m *HomePage) Handle(c *core.Ctx) error {
+	checkCS3()
+
+	return c.String("Hello world")
+}
+
+func checkCS3() {
 	// Create S3 storage with default
 	fs := storage.Instance(cs3.Type)
 
+	// Make Dir and Put Object
 	if ok := fs.MakeDir("one/two"); ok {
 		fs.Put("one/two/hello.txt", "Hello world")
 	}
 
-	return c.String("Hello world " + fs.Url("one/two/hello.txt"))
+	// Path
+	log.Infof("URL object %s", fs.Url("one/two/hello.txt"))
+
+	// Copy & Move
+	fs.Copy("one/two/hello.txt", "one/two/world.txt")
+	fs.Move("one/two/world.txt", "one/world.txt")
+
+	// Get Object
+	data, _ := fs.Get("one/world.txt")
+	log.Infof("Read object %s", utils.UnsafeStr(data))
+
+	log.Infof("Size %d", fs.Size("one/two/hello.txt"))
+
+	// Last Modify
+	log.Infof("Last Modify %v", fs.LastModified("one/two/hello.txt"))
+
+	// Delete Objects
+	fs.Delete("one/two/hello.txt")
+
+	// Delete Dir
+	fs.DeleteDir("one")
 }
 
 // =========================================================================================

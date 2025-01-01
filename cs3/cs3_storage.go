@@ -199,6 +199,7 @@ func (s *Storage) Move(from, to string) bool {
 func (s *Storage) Exists(path string) bool {
 	return s.Size(path) != 0
 }
+
 func (s *Storage) Get(path string) ([]byte, error) {
 	result, err := s.getObject(path)
 
@@ -230,6 +231,14 @@ func (s *Storage) Size(path string) int64 {
 		},
 	})
 	if err != nil {
+		log.Errorf("Unable to get object size from %v. Here's why: %v\n", path, err)
+
+		return 0
+	}
+
+	if result.ObjectSize == nil {
+		log.Errorf("Unable to get object size from %v. Here's why: ObjectSize is NULL\n", path)
+
 		return 0
 	}
 
