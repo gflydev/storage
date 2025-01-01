@@ -40,10 +40,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gflydev/core v1.11.0 h1:iyH4RoOrRnqlUWCWfXQFhoetRYV8EIBUez9V8KruoJI=
 github.com/gflydev/core v1.11.0/go.mod h1:ueXLtWEDNMEDmK3t4yry06gpJOQAHChb4bdTLAPgyZA=
-github.com/gflydev/storage v1.1.1 h1:UfA8Q95pqt+Y3oLpf2aQcbVsSTdXCI+pR4Qupy1fueQ=
-github.com/gflydev/storage v1.1.1/go.mod h1:lcAY8HT89JkNNVfNw7xQIjHRZj6LC1otMi+mcju1SSI=
-github.com/gflydev/storage/local v1.1.1 h1:9WRwdeoceuoUjR5v03WawDkM5PkAPFxzol1uRcY/saU=
-github.com/gflydev/storage/local v1.1.1/go.mod h1:AlWQ4wrOj8WQZNposn+dJXXPzedXDncHpEKZLiDyssg=
+github.com/gflydev/storage v1.1.2 h1:50k5JALXafUP8HcDcbKIf1ckMJuDs1e86dTxIh68EyA=
+github.com/gflydev/storage v1.1.2/go.mod h1:Diib2gklMylJ5W6lo/rr3ShXUVowkV1riCXZlB1MWzU=
+github.com/gflydev/storage/local v1.1.2 h1:H5tCTaoDs661Cw1Tkh7urM0EKHWNTHbW0F6HbxonM9M=
+github.com/gflydev/storage/local v1.1.2/go.mod h1:pWZl+q39FyKnqz+vdtY7b2zRRcZNOcfQZiJU5ZY7Lrk=
 github.com/klauspost/compress v1.17.11 h1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=
 github.com/klauspost/compress v1.17.11/go.mod h1:pMDklpSncoRMuLFrf1W9Ss9KT+0rH90U12bZKk7uwG0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
