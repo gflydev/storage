@@ -6,8 +6,8 @@ import (
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
 	"github.com/gflydev/storage/s3"
-	_ "github.com/gflydev/storage/s3"
 	"github.com/gflydev/view/pongo"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 // =========================================================================================

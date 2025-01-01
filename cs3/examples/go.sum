@@ -44,6 +44,7 @@ github.com/gflydev/core v1.11.0 h1:iyH4RoOrRnqlUWCWfXQFhoetRYV8EIBUez9V8KruoJI=
 github.com/gflydev/core v1.11.0/go.mod h1:ueXLtWEDNMEDmK3t4yry06gpJOQAHChb4bdTLAPgyZA=
 github.com/gflydev/storage v1.1.2 h1:50k5JALXafUP8HcDcbKIf1ckMJuDs1e86dTxIh68EyA=
 github.com/gflydev/storage v1.1.2/go.mod h1:Diib2gklMylJ5W6lo/rr3ShXUVowkV1riCXZlB1MWzU=
+github.com/gflydev/storage/cs3 v1.1.0 h1:UhKW7T2Omv8945jxsfdN+fqp14JFcBC4p/CDJNDh9ns=
 github.com/gflydev/storage/cs3 v1.1.0/go.mod h1:hZaqcd6pSkIa7Bn4Th6RnTwDnuQ2GeT7sdujlUxkj8Q=
 github.com/gflydev/storage/local v1.1.2 h1:H5tCTaoDs661Cw1Tkh7urM0EKHWNTHbW0F6HbxonM9M=
 github.com/gflydev/storage/local v1.1.2/go.mod h1:pWZl+q39FyKnqz+vdtY7b2zRRcZNOcfQZiJU5ZY7Lrk=

@@ -7,6 +7,7 @@ require (
 	github.com/gflydev/storage v1.1.1
 	github.com/gflydev/storage/s3 v1.1.1
 	github.com/gflydev/view/pongo v1.0.2
+	github.com/joho/godotenv v1.5.1
 )
 
 require (
