@@ -1,4 +1,6 @@
-# gFly S3 Storage
+# gFly Wasabi Storage
+
+https://docs.wasabi.com/docs/how-do-i-use-aws-sdk-for-go-golang-with-wasabi
 
 ### Usage
 
@@ -8,7 +10,7 @@ Install
 go get -u github.com/gflydev/storage@v1.1.0
 
 # S3 Storage
-go get -u github.com/gflydev/storage/s3@v1.1.0
+go get -u github.com/gflydev/storage/ws3@v1.0.0
 ```
 
 Quick usage `main.go`
@@ -16,15 +18,15 @@ Quick usage `main.go`
 import (
     "github.com/gflydev/core"
     "github.com/gflydev/storage"
-    storageS3 "github.com/gflydev/storage/s3"	
+    storageWS3 "github.com/gflydev/storage/ws3"	
 )
 
 func main() {
-    // Register S3 storage
-    storage.Register(storageS3.Type, storageS3.New())
+    // Register WS3 storage
+    storage.Register(storageWS3.Type, storageWS3.New())
 
     // Create S3 storage with default
-    fs := storage.Instance(storageS3.Type)
+    fs := storage.Instance(storageWS3.Type)
 
 	// Create folder `foo/bar` and add file `hello.txt`
     if ok := fs.MakeDir("foo/bar"); ok {
@@ -33,9 +35,9 @@ func main() {
 }
 ```
 
-### S3 setting
+### WS3 setting
 
-Make sure S3 below setting:
+Make sure WS3 below setting:
 
 Section `Bucket policy`
 ```bash

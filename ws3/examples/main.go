@@ -6,7 +6,7 @@ import (
 	"github.com/gflydev/core/log"
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
-	"github.com/gflydev/storage/cs3"
+	"github.com/gflydev/storage/ws3"
 	"github.com/gflydev/view/pongo"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -46,12 +46,14 @@ type HomePage struct {
 }
 
 func (m *HomePage) Handle(c *core.Ctx) error {
+	checkCS3()
+
 	return c.String("Hello world")
 }
 
 func checkCS3() {
 	// Create S3 storage with default
-	fs := storage.Instance(cs3.Type)
+	fs := storage.Instance(ws3.Type)
 
 	// Make Dir and Put Object
 	if ok := fs.MakeDir("one/two"); ok {
@@ -112,12 +114,10 @@ func main() {
 	core.RegisterView(pongo.New())
 
 	// Register storages
-	storage.Register(cs3.Type, cs3.New())
+	storage.Register(ws3.Type, ws3.New())
 
 	// Register router
 	app.RegisterRouter(router)
-
-	checkCS3()
 
 	app.Run()
 }

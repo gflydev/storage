@@ -24,7 +24,7 @@ func main() {
     storage.Register(storageLocal.Type, storageLocal.New())
 
     // Create file storage with default
-    fs := storage.Instance()
+    fs := storage.Instance(storageLocal.Type)
 
 	// Create folder `foo/bar` and add file `hello.txt`
     if ok := fs.MakeDir("foo/bar"); ok {

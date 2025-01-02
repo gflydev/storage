@@ -24,7 +24,7 @@ func main() {
     storage.Register(storageS3.Type, storageCS3.New())
 
     // Create S3 storage with default
-    fs := storage.Instance(cs3.Type)
+    fs := storage.Instance(storageS3.Type)
 
 	// Create folder `foo/bar` and add file `hello.txt`
     if ok := fs.MakeDir("foo/bar"); ok {
@@ -36,5 +36,3 @@ func main() {
 ### CS3 setting
 
 Make sure CS3 below setting:
-
-f7fa66e2663f40628d0d1a14d566355e
