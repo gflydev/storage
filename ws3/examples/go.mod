@@ -2,6 +2,10 @@ module examples
 
 go 1.22.6
 
+replace github.com/gflydev/storage => ../../
+
+replace github.com/gflydev/storage/ws3 => ../
+
 require (
 	github.com/gflydev/core v1.11.0
 	github.com/gflydev/storage v1.1.2

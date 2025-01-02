@@ -46,12 +46,10 @@ type HomePage struct {
 }
 
 func (m *HomePage) Handle(c *core.Ctx) error {
-	checkCS3()
-
 	return c.String("Hello world")
 }
 
-func checkCS3() {
+func checkWS3() {
 	// Create S3 storage with default
 	fs := storage.Instance(ws3.Type)
 
@@ -118,6 +116,8 @@ func main() {
 
 	// Register router
 	app.RegisterRouter(router)
+
+	checkWS3()
 
 	app.Run()
 }
