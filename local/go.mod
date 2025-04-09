@@ -4,7 +4,7 @@ go 1.24.0
 
 require github.com/gflydev/core v1.11.3
 
-require github.com/gflydev/storage v1.1.2
+require github.com/gflydev/storage v1.1.3
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
