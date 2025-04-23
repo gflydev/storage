@@ -19,8 +19,12 @@ func (t Type) String() string {
 type poolType map[string]IStorage
 
 var (
-	pool        = make(poolType)
+	// Storage pool
+	pool = make(poolType)
+	// Default storage
 	defaultType = utils.Getenv("FILESYSTEM_TYPE", "local")
+	// DirFileHolder Default file holder for directory
+	DirFileHolder = "dir.info"
 )
 
 // ========================================================================================

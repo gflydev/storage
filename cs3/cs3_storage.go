@@ -275,7 +275,7 @@ func (s *Storage) Url(path string) string {
 }
 
 func (s *Storage) MakeDir(dir string) bool {
-	return s.Put(fmt.Sprintf("%s/.info", dir), "Info")
+	return s.Put(fmt.Sprintf("%s/%s", dir, storage.DirFileHolder), "Place holder")
 }
 
 func (s *Storage) DeleteDir(dir string) bool {
