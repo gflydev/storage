@@ -34,6 +34,7 @@ var (
 	secretKey = utils.Getenv("AWS_SECRET_ACCESS_KEY", "")
 	region    = utils.Getenv("AWS_S3_REGION", "")
 	bucket    = utils.Getenv("AWS_S3_BUCKET", "")
+	endPoint  = utils.Getenv("AWS_S3_ENDPOINT", "")
 )
 
 // New Create S3 Storage with basics info.
@@ -44,6 +45,7 @@ func New() *Storage {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithCredentialsProvider(creds),
 		config.WithRegion(region),
+		config.WithBaseEndpoint(endPoint),
 	)
 	if err != nil {
 		log.Fatal(err)
