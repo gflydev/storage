@@ -317,7 +317,7 @@ func (s *Storage) DeleteDir(dir string) bool {
 }
 
 func (s *Storage) Append(path, data string) bool {
-	log.Errorf("Unable to append data %s into %s. Here's why: %v\n", path, data, errors.NotImplemented.Error())
+	log.Errorf("Unable to append data %s into %s. Here's why: %v\n", path, data, errors.NotImplemented)
 
 	return false
 }
