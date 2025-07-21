@@ -37,7 +37,7 @@ var (
 
 // Endpoint returns the endpoint host without protocol scheme for minio client initialization.
 // The function strips both "https://" and "http://" prefixes from the endpoint string.
-func Endpoint() string {
+func endpointURL() string {
 	// Strip protocol scheme from endpoint for minio client
 	return strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
 }
@@ -45,7 +45,7 @@ func Endpoint() string {
 // New Create S3 Storage with basics info.
 func New() *Storage {
 	// Initialize minio client object.
-	minioClient, err := minio.New(Endpoint(), &minio.Options{
+	minioClient, err := minio.New(endpointURL(), &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: true,
 	})
