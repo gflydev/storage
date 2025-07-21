@@ -32,16 +32,20 @@ var (
 	region     = utils.Getenv("CS_REGION", "")
 	bucket     = utils.Getenv("CS_BUCKET", "")
 	bucketCode = utils.Getenv("CS_BUCKET_CODE", "")
-	endPoint   = utils.Getenv("CS_ENDPOINT", "https://sin1.contabostorage.com")
+	endPoint   = utils.Getenv("CS_ENDPOINT", "sin1.contabostorage.com")
 )
+
+// Endpoint returns the endpoint host without protocol scheme for minio client initialization.
+// The function strips both "https://" and "http://" prefixes from the endpoint string.
+func Endpoint() string {
+	// Strip protocol scheme from endpoint for minio client
+	return strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
+}
 
 // New Create S3 Storage with basics info.
 func New() *Storage {
-	// Strip protocol scheme from endpoint for minio client
-	cleanEndpoint := strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
-
 	// Initialize minio client object.
-	minioClient, err := minio.New(cleanEndpoint, &minio.Options{
+	minioClient, err := minio.New(Endpoint(), &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: true,
 	})
