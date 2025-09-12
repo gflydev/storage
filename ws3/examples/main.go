@@ -1,6 +1,7 @@
 package main
 
 import (
+	"examples/controllers"
 	"fmt"
 	"github.com/gflydev/core"
 	"github.com/gflydev/core/log"
@@ -69,16 +70,17 @@ func checkWS3() {
 	data, _ := fs.Get("one/world.txt")
 	log.Infof("Read object %s", utils.UnsafeStr(data))
 
-	log.Infof("Size %d", fs.Size("one/two/hello.txt"))
-
 	// Last Modify
 	log.Infof("Last Modify %v", fs.LastModified("one/two/hello.txt"))
 
+	// Size Info
+	//log.Infof("Size %d", fs.Size("one/two/hello.txt"))
+
 	// Delete Objects
-	fs.Delete("one/two/hello.txt")
+	//fs.Delete("one/two/hello.txt")
 
 	// Delete Dir
-	fs.DeleteDir("one")
+	//fs.DeleteDir("one")
 }
 
 // =========================================================================================
@@ -99,6 +101,9 @@ func router(g core.IFly) {
 
 	// Web Routers
 	g.GET("/home", NewHomePage())
+
+	// Proxy to remote storage
+	g.GET("/objects/{path:*}", controllers.NewObjectsProxyPage())
 }
 
 // =========================================================================================
@@ -117,7 +122,7 @@ func main() {
 	// Register router
 	app.RegisterRouter(router)
 
-	checkWS3()
+	//checkWS3()
 
 	app.Run()
 }

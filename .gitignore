@@ -39,3 +39,4 @@ Dev/
 .cache
 *.dev
 .env
+dir.info

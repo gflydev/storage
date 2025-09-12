@@ -3,17 +3,14 @@ package ws3
 import (
 	"context"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/gflydev/core"
 	"github.com/gflydev/core/errors"
 	"github.com/gflydev/core/log"
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
 	"github.com/gflydev/storage/local"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"io"
 	"os"
 	"path/filepath"
@@ -34,33 +31,35 @@ var (
 	secretKey = utils.Getenv("WS_SECRET_ACCESS_KEY", "")
 	region    = utils.Getenv("WS_REGION", "")
 	bucket    = utils.Getenv("WS_BUCKET", "")
-	endPoint  = utils.Getenv("WS_ENDPOINT", "https://s3.ap-southeast-1.wasabisys.com")
+	endPoint  = utils.Getenv("WS_ENDPOINT", "s3.ap-southeast-1.wasabisys.com")
 )
+
+// Endpoint returns the endpoint host without protocol scheme for minio client initialization.
+// The function strips both "https://" and "http://" prefixes from the endpoint string.
+func endpointURL() string {
+	// Strip protocol scheme from endpoint for minio client
+	return strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
+}
 
 // New Create S3 Storage with basics info.
 func New() *Storage {
-	creds := credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")
-
-	// Load the Shared AWS Configuration (~/.aws/config). Note: Also load combine .env file.
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithCredentialsProvider(creds),
-		config.WithRegion(region),
-		config.WithBaseEndpoint(endPoint),
-	)
+	// Initialize minio client object.
+	minioClient, err := minio.New(endpointURL(), &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure: true,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create an Amazon S3 service client
 	return &Storage{
-		S3Client: s3.NewFromConfig(cfg, func(o *s3.Options) {
-			o.UsePathStyle = true
-		}),
+		S3Client: minioClient,
 	}
 }
 
 type Storage struct {
-	S3Client *s3.Client
+	S3Client *minio.Client
 }
 
 // ========================================================================================
@@ -121,11 +120,7 @@ func (s *Storage) PutData(path string, contents []byte) bool {
 }
 
 func (s *Storage) PutFile(path string, fileSource *os.File) bool {
-	_, err := s.S3Client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-		Body:   fileSource,
-	})
+	_, err := s.S3Client.PutObject(context.TODO(), bucket, path, fileSource, -1, minio.PutObjectOptions{ContentType: core.MIMEOctetStream})
 
 	if err != nil {
 		log.Errorf("Unable to write file %q. Here's why: %v\n", path, err)
@@ -143,12 +138,14 @@ func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) boo
 
 		return false
 	}
+	defer func(fileSource *os.File) {
+		err := fileSource.Close()
+		if err != nil {
+			log.Errorf("Unable to close file %q. Here's why: %v\n", filePath, err)
+		}
+	}(fileSource)
 
-	_, err = s.S3Client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-		Body:   fileSource,
-	})
+	_, err = s.S3Client.PutObject(context.TODO(), bucket, path, fileSource, -1, minio.PutObjectOptions{ContentType: core.MIMEOctetStream})
 	if err != nil {
 		log.Errorf("Unable to write file %q. Here's why: %v\n", path, err)
 
@@ -159,10 +156,7 @@ func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) boo
 }
 
 func (s *Storage) Delete(path string) bool {
-	_, err := s.S3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-	})
+	err := s.S3Client.RemoveObject(context.TODO(), bucket, path, minio.RemoveObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to delete file %q. Here's why: %v\n", path, err)
 
@@ -173,11 +167,15 @@ func (s *Storage) Delete(path string) bool {
 }
 
 func (s *Storage) Copy(from, to string) bool {
-	_, err := s.S3Client.CopyObject(context.TODO(), &s3.CopyObjectInput{
-		Bucket:     aws.String(bucket),
-		CopySource: aws.String(fmt.Sprintf("%s/%s", bucket, from)),
-		Key:        aws.String(to),
-	})
+	srcOpts := minio.CopySrcOptions{
+		Bucket: bucket,
+		Object: from,
+	}
+	dstOpts := minio.CopyDestOptions{
+		Bucket: bucket,
+		Object: to,
+	}
+	_, err := s.S3Client.CopyObject(context.TODO(), dstOpts, srcOpts)
 	if err != nil {
 		log.Errorf("Unable to copy file %s to %s. Here's why: %v\n", from, to, err)
 
@@ -206,14 +204,14 @@ func (s *Storage) Get(path string) ([]byte, error) {
 		return nil, err
 	}
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
+	defer func(obj *minio.Object) {
+		err := obj.Close()
 		if err != nil {
-			log.Errorf("Unable to close body. Here's why: %v\n", err)
+			log.Errorf("Unable to close object. Here's why: %v\n", err)
 		}
-	}(result.Body)
+	}(result)
 
-	body, err := io.ReadAll(result.Body)
+	body, err := io.ReadAll(result)
 	if err != nil {
 		log.Errorf("Unable read object body from %v. Here's why: %v\n", path, err)
 	}
@@ -222,36 +220,18 @@ func (s *Storage) Get(path string) ([]byte, error) {
 }
 
 func (s *Storage) Size(path string) int64 {
-	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-		ObjectAttributes: []types.ObjectAttributes{
-			types.ObjectAttributesObjectSize,
-		},
-	})
+	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object size from %v. Here's why: %v\n", path, err)
 
 		return 0
 	}
 
-	if result.ObjectSize == nil {
-		log.Errorf("Unable to get object size from %v. Here's why: ObjectSize is NULL\n", path)
-
-		return 0
-	}
-
-	return *result.ObjectSize
+	return result.Size
 }
 
 func (s *Storage) LastModified(path string) time.Time {
-	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-		ObjectAttributes: []types.ObjectAttributes{
-			types.ObjectAttributesObjectParts,
-		},
-	})
+	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 
 	if err != nil {
 		log.Errorf("Unable to get info of %s. Here's why: %v\n", path, err)
@@ -259,7 +239,7 @@ func (s *Storage) LastModified(path string) time.Time {
 		return time.Time{}
 	}
 
-	return *result.LastModified
+	return result.LastModified
 }
 
 // Url Get public URL of an object via path
@@ -280,37 +260,39 @@ func (s *Storage) MakeDir(dir string) bool {
 func (s *Storage) DeleteDir(dir string) bool {
 	// Get all objects in dir
 	// Note: Can not delete a dir have children object.
-	result, err := s.S3Client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(dir),
+	objectCh := s.S3Client.ListObjects(context.TODO(), bucket, minio.ListObjectsOptions{
+		Prefix:    dir,
+		Recursive: true,
 	})
-	var contents []types.Object
-	if err != nil {
-		log.Errorf("Unable to list objects from dir %v. Here's why: %v\n", dir, err)
-	} else {
-		contents = result.Contents
-	}
 
-	var objectIds []types.ObjectIdentifier
+	var objectNames []string
 
 	// Collect children objects
-	for _, object := range contents {
-		objectIds = append(objectIds, types.ObjectIdentifier{Key: object.Key})
+	for object := range objectCh {
+		if object.Err != nil {
+			log.Errorf("Unable to list objects from dir %v. Here's why: %v\n", dir, object.Err)
+			return false
+		}
+		objectNames = append(objectNames, object.Key)
 	}
 
-	// Append current object
-	objectIds = append(objectIds, types.ObjectIdentifier{Key: aws.String(dir)})
+	// Append current object if not already included
+	objectNames = append(objectNames, dir)
 
 	// Delete objects
-	_, err = s.S3Client.DeleteObjects(context.TODO(), &s3.DeleteObjectsInput{
-		Bucket: aws.String(bucket),
-		Delete: &types.Delete{Objects: objectIds},
-	})
+	objectsCh := make(chan minio.ObjectInfo)
+	go func() {
+		defer close(objectsCh)
+		for _, objectName := range objectNames {
+			objectsCh <- minio.ObjectInfo{Key: objectName}
+		}
+	}()
 
-	if err != nil {
-		log.Errorf("Unable to delete object from bucket %v. Here's why: %v\n", dir, err)
-
-		return false
+	for rErr := range s.S3Client.RemoveObjects(context.TODO(), bucket, objectsCh, minio.RemoveObjectsOptions{}) {
+		if rErr.Err != nil {
+			log.Errorf("Unable to delete object %s from bucket %v. Here's why: %v\n", rErr.ObjectName, dir, rErr.Err)
+			return false
+		}
 	}
 
 	return true
@@ -322,11 +304,8 @@ func (s *Storage) Append(path, data string) bool {
 	return false
 }
 
-func (s *Storage) getObject(path string) (*s3.GetObjectOutput, error) {
-	result, err := s.S3Client.GetObject(context.TODO(), &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
-	})
+func (s *Storage) getObject(path string) (*minio.Object, error) {
+	result, err := s.S3Client.GetObject(context.TODO(), bucket, path, minio.GetObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object %s. Here's why: %v\n", path, err)
 
