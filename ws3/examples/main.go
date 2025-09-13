@@ -2,6 +2,7 @@ package main
 
 import (
 	"examples/controllers"
+	"examples/cors"
 	"fmt"
 	"github.com/gflydev/core"
 	"github.com/gflydev/core/log"
@@ -121,6 +122,11 @@ func main() {
 
 	// Register router
 	app.RegisterRouter(router)
+
+	// Global middlewares
+	app.Use(cors.New(cors.Data{
+		core.HeaderAccessControlAllowOrigin: cors.AllowedOrigin,
+	}))
 
 	//checkWS3()
 

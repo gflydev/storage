@@ -314,3 +314,9 @@ func (s *Storage) getObject(path string) (*minio.Object, error) {
 
 	return result, nil
 }
+
+// GetObjectStream returns a stream (io.ReadCloser) for the object at the given path
+// This allows for efficient streaming without loading the entire file into memory
+func (s *Storage) GetObjectStream(path string) (*minio.Object, error) {
+	return s.getObject(path)
+}
