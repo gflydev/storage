@@ -10,6 +10,7 @@ github.com/flosch/pongo2/v6 v6.0.0 h1:lsGru8IAzHgIAw6H2m4PCyleO58I40ow6apih0WprM
 github.com/flosch/pongo2/v6 v6.0.0/go.mod h1:CuDpFm47R0uGGE7z13/tTlt1Y6zdxvr2RLT5LJhsHEU=
 github.com/gflydev/core v1.17.5 h1:bbraM1TRbLqzgYjlntX8ZTnFQGyJHaEctqvxN/1AwQA=
 github.com/gflydev/core v1.17.5/go.mod h1:PXw2qZiDCTbu7ms87g0inJYrrHuoceDbL+4G2xomPNE=
+github.com/gflydev/core v1.17.6/go.mod h1:PXw2qZiDCTbu7ms87g0inJYrrHuoceDbL+4G2xomPNE=
 github.com/gflydev/storage v1.1.5 h1:VQsG0UwjJaJNdZp+8yjcFiI1JUYhg5+HgLD/JR2AkI8=
 github.com/gflydev/storage v1.1.5/go.mod h1:tV9mkGak2DyLmRQtl4Bj+/HeAIHaijlTLxDvRHg1ujg=
 github.com/gflydev/storage/local v1.1.5 h1:eSz496d2VGiWph4iPG7E52ZT3jcqs3I0Kbs+yetW5h8=

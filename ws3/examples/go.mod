@@ -5,7 +5,7 @@ go 1.24.0
 replace github.com/gflydev/storage/ws3 => ../
 
 require (
-	github.com/gflydev/core v1.17.5
+	github.com/gflydev/core v1.17.6
 	github.com/gflydev/storage v1.1.5
 	github.com/gflydev/storage/ws3 v1.1.5
 	github.com/gflydev/view/pongo v1.0.3
