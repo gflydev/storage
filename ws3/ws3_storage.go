@@ -304,6 +304,12 @@ func (s *Storage) Append(path, data string) bool {
 	return false
 }
 
+// GetStream returns a stream (io.ReadCloser) for the object at the given path
+// This allows for efficient streaming without loading the entire file into memory
+func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
+	return s.getObject(path)
+}
+
 func (s *Storage) getObject(path string) (*minio.Object, error) {
 	result, err := s.S3Client.GetObject(context.TODO(), bucket, path, minio.GetObjectOptions{})
 	if err != nil {
@@ -313,10 +319,4 @@ func (s *Storage) getObject(path string) (*minio.Object, error) {
 	}
 
 	return result, nil
-}
-
-// GetObjectStream returns a stream (io.ReadCloser) for the object at the given path
-// This allows for efficient streaming without loading the entire file into memory
-func (s *Storage) GetObjectStream(path string) (*minio.Object, error) {
-	return s.getObject(path)
 }

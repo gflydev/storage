@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/gflydev/core/utils"
+	"io"
 	"os"
 	"time"
 )
@@ -92,4 +93,8 @@ type IStorage interface {
 
 	// Append Add string content to bottom file
 	Append(path, data string) bool
+
+	// GetStream returns a stream (io.ReadCloser) for the object at the given path
+	// This allows for efficient streaming without loading the entire file into memory
+	GetStream(path string) (io.ReadCloser, error)
 }

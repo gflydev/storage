@@ -127,7 +127,7 @@ func readObject(c *core.Ctx) error {
 	log.Infof("Streaming object: %s (size: %d, type: %s)", objectPath, objectInfo.Size, objectInfo.ContentType)
 
 	// Get the object as a stream instead of loading into memory
-	objectStream, err := fs.GetObjectStream(objectPath)
+	objectStream, err := fs.GetStream(objectPath)
 	if err != nil {
 		log.Errorf("Unable to get object stream for %s: %v", objectPath, err)
 		return c.Status(core.StatusInternalServerError).String("Internal server error")
@@ -164,7 +164,7 @@ func readStream(c *core.Ctx) error {
 	c.SetHeader("Content-Range", fmt.Sprintf("bytes 0-%d/%d", objectInfo.Size, objectInfo.Size))
 
 	// Get the object as a stream instead of loading into memory
-	objectStream, err := fs.GetObjectStream(objectPath)
+	objectStream, err := fs.GetStream(objectPath)
 	if err != nil {
 		log.Errorf("Unable to get object stream for %s: %v", objectPath, err)
 		return c.Status(core.StatusInternalServerError).String("Internal server error")
