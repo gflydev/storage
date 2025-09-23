@@ -10,11 +10,16 @@ github.com/flosch/pongo2/v6 v6.0.0 h1:lsGru8IAzHgIAw6H2m4PCyleO58I40ow6apih0WprM
 github.com/flosch/pongo2/v6 v6.0.0/go.mod h1:CuDpFm47R0uGGE7z13/tTlt1Y6zdxvr2RLT5LJhsHEU=
 github.com/gflydev/core v1.17.5 h1:bbraM1TRbLqzgYjlntX8ZTnFQGyJHaEctqvxN/1AwQA=
 github.com/gflydev/core v1.17.5/go.mod h1:PXw2qZiDCTbu7ms87g0inJYrrHuoceDbL+4G2xomPNE=
+github.com/gflydev/core v1.17.6 h1:dvZQ83N4rQxxzEQhuA4h8L2tTBRAOy6v+Y+bo/e/Dxg=
 github.com/gflydev/core v1.17.6/go.mod h1:PXw2qZiDCTbu7ms87g0inJYrrHuoceDbL+4G2xomPNE=
 github.com/gflydev/storage v1.1.5 h1:VQsG0UwjJaJNdZp+8yjcFiI1JUYhg5+HgLD/JR2AkI8=
 github.com/gflydev/storage v1.1.5/go.mod h1:tV9mkGak2DyLmRQtl4Bj+/HeAIHaijlTLxDvRHg1ujg=
+github.com/gflydev/storage v1.1.6 h1:B/G+4nz+96bfpT0oPGpUaHHo2LYfM6vhi5m6Nd/3V60=
+github.com/gflydev/storage v1.1.6/go.mod h1:lAsmPaCzQwdLycTZU4H6WFTR48WVyeB7vvLKZpyLoNU=
 github.com/gflydev/storage/local v1.1.5 h1:eSz496d2VGiWph4iPG7E52ZT3jcqs3I0Kbs+yetW5h8=
 github.com/gflydev/storage/local v1.1.5/go.mod h1:prfrORCqiIR3GuNMzU9AzlAcpiAh5qG8Y/IaH6DX6iw=
+github.com/gflydev/storage/local v1.1.6 h1:pilXfXfCutkxZnjFntwVYGILTHprTwRBbrbRPiW7yVc=
+github.com/gflydev/storage/local v1.1.6/go.mod h1:/z53fcDqnSqHbr4P4MRVu/NYHCyoAb6+x1Qw4mk/gw4=
 github.com/gflydev/view/pongo v1.0.3 h1:6p20a9bYC+RNnfR/HMfVDDEZT6yumYGVg6uTqEp5S+M=
 github.com/gflydev/view/pongo v1.0.3/go.mod h1:0Lz7okfUMSOVFV+LZhIeSN+oh95KeRnqkzH0mun6+Vs=
 github.com/go-ini/ini v1.67.0 h1:z6ZrTEZqSWOTyH2FlglNbNgARyHG8oLW9gMELqKr06A=

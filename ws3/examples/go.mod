@@ -6,8 +6,8 @@ replace github.com/gflydev/storage/ws3 => ../
 
 require (
 	github.com/gflydev/core v1.17.6
-	github.com/gflydev/storage v1.1.5
-	github.com/gflydev/storage/ws3 v1.1.5
+	github.com/gflydev/storage v1.1.6
+	github.com/gflydev/storage/ws3 v1.1.7
 	github.com/gflydev/view/pongo v1.0.3
 	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.95
@@ -19,7 +19,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/flosch/pongo2/v6 v6.0.0 // indirect
-	github.com/gflydev/storage/local v1.1.5 // indirect
+	github.com/gflydev/storage/local v1.1.6 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
