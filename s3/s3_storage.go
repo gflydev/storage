@@ -29,16 +29,13 @@ const (
 	Type = storage.Type("s3")
 )
 
-var (
-	accessKey = utils.Getenv("AWS_ACCESS_KEY_ID", "")
-	secretKey = utils.Getenv("AWS_SECRET_ACCESS_KEY", "")
-	region    = utils.Getenv("AWS_S3_REGION", "")
-	bucket    = utils.Getenv("AWS_S3_BUCKET", "")
-	endPoint  = utils.Getenv("AWS_S3_ENDPOINT", "")
-)
-
 // New Create S3 Storage with basics info.
 func New() *Storage {
+	accessKey := utils.Getenv("AWS_ACCESS_KEY_ID", "")
+	secretKey := utils.Getenv("AWS_SECRET_ACCESS_KEY", "")
+	region := utils.Getenv("AWS_S3_REGION", "")
+	endPoint := utils.Getenv("AWS_S3_ENDPOINT", "")
+
 	creds := credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")
 
 	// Load the Shared AWS Configuration (~/.aws/config). Note: Also load combine .env file.
@@ -119,6 +116,8 @@ func (s *Storage) PutData(path string, contents []byte) bool {
 }
 
 func (s *Storage) PutFile(path string, fileSource *os.File) bool {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	_, err := s.S3Client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -134,6 +133,8 @@ func (s *Storage) PutFile(path string, fileSource *os.File) bool {
 }
 
 func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) bool {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	fileSource, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Errorf("Unable to read file %q. Here's why: %v\n", filePath, err)
@@ -156,6 +157,8 @@ func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) boo
 }
 
 func (s *Storage) Delete(path string) bool {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	_, err := s.S3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -170,6 +173,8 @@ func (s *Storage) Delete(path string) bool {
 }
 
 func (s *Storage) Copy(from, to string) bool {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	_, err := s.S3Client.CopyObject(context.TODO(), &s3.CopyObjectInput{
 		Bucket:     aws.String(bucket),
 		CopySource: aws.String(fmt.Sprintf("%s/%s", bucket, from)),
@@ -219,6 +224,8 @@ func (s *Storage) Get(path string) ([]byte, error) {
 }
 
 func (s *Storage) Size(path string) int64 {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -236,6 +243,8 @@ func (s *Storage) Size(path string) int64 {
 }
 
 func (s *Storage) LastModified(path string) time.Time {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	result, err := s.S3Client.GetObjectAttributes(context.TODO(), &s3.GetObjectAttributesInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
@@ -258,6 +267,9 @@ func (s *Storage) LastModified(path string) time.Time {
 //	Pattern URL (Use it) `https://<bucket-name>.s3.<region>.amazonaws.com/<key>`
 //	Pattern URL `https://<region>.amazonaws.com/<bucket-name>/<key>`
 func (s *Storage) Url(path string) string {
+	region := utils.Getenv("AWS_S3_REGION", "")
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s",
 		bucket,
 		region,
@@ -270,6 +282,8 @@ func (s *Storage) MakeDir(dir string) bool {
 }
 
 func (s *Storage) DeleteDir(dir string) bool {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	// Get all objects in dir
 	// Note: Can not delete a dir have children object.
 	result, err := s.S3Client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
@@ -321,6 +335,8 @@ func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
 }
 
 func (s *Storage) getObject(path string) (*s3.GetObjectOutput, error) {
+	bucket := utils.Getenv("AWS_S3_BUCKET", "")
+
 	result, err := s.S3Client.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),

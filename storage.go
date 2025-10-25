@@ -22,8 +22,7 @@ type poolType map[string]IStorage
 var (
 	// Storage pool
 	pool = make(poolType)
-	// Default storage
-	defaultType = utils.Getenv("FILESYSTEM_TYPE", "local")
+
 	// DirFileHolder Default file holder for directory
 	DirFileHolder = "dir.info"
 )
@@ -42,6 +41,9 @@ func Register(name Type, storage IStorage) {
 // Instance receive a storage instance. Get default storage for NONE `name` argument
 func Instance(name ...Type) IStorage {
 	if len(name) == 0 {
+		// Default storage
+		defaultType := utils.Getenv("FILESYSTEM_TYPE", "local")
+
 		return pool[defaultType]
 	}
 

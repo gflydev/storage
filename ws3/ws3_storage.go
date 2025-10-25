@@ -26,23 +26,20 @@ const (
 	Type = storage.Type("ws3")
 )
 
-var (
-	accessKey = utils.Getenv("WS_ACCESS_KEY_ID", "")
-	secretKey = utils.Getenv("WS_SECRET_ACCESS_KEY", "")
-	region    = utils.Getenv("WS_REGION", "")
-	bucket    = utils.Getenv("WS_BUCKET", "")
-	endPoint  = utils.Getenv("WS_ENDPOINT", "s3.ap-southeast-1.wasabisys.com")
-)
-
 // Endpoint returns the endpoint host without protocol scheme for minio client initialization.
 // The function strips both "https://" and "http://" prefixes from the endpoint string.
 func endpointURL() string {
+	endPoint := utils.Getenv("WS_ENDPOINT", "s3.ap-southeast-1.wasabisys.com")
+
 	// Strip protocol scheme from endpoint for minio client
 	return strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
 }
 
 // New Create S3 Storage with basics info.
 func New() *Storage {
+	accessKey := utils.Getenv("WS_ACCESS_KEY_ID", "")
+	secretKey := utils.Getenv("WS_SECRET_ACCESS_KEY", "")
+
 	// Initialize minio client object.
 	minioClient, err := minio.New(endpointURL(), &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
@@ -120,6 +117,8 @@ func (s *Storage) PutData(path string, contents []byte) bool {
 }
 
 func (s *Storage) PutFile(path string, fileSource *os.File) bool {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	_, err := s.S3Client.PutObject(context.TODO(), bucket, path, fileSource, -1, minio.PutObjectOptions{ContentType: core.MIMEOctetStream})
 
 	if err != nil {
@@ -132,6 +131,8 @@ func (s *Storage) PutFile(path string, fileSource *os.File) bool {
 }
 
 func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) bool {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	fileSource, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Errorf("Unable to read file %q. Here's why: %v\n", filePath, err)
@@ -156,6 +157,8 @@ func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) boo
 }
 
 func (s *Storage) Delete(path string) bool {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	err := s.S3Client.RemoveObject(context.TODO(), bucket, path, minio.RemoveObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to delete file %q. Here's why: %v\n", path, err)
@@ -167,6 +170,8 @@ func (s *Storage) Delete(path string) bool {
 }
 
 func (s *Storage) Copy(from, to string) bool {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	srcOpts := minio.CopySrcOptions{
 		Bucket: bucket,
 		Object: from,
@@ -220,6 +225,8 @@ func (s *Storage) Get(path string) ([]byte, error) {
 }
 
 func (s *Storage) Size(path string) int64 {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object size from %v. Here's why: %v\n", path, err)
@@ -231,6 +238,8 @@ func (s *Storage) Size(path string) int64 {
 }
 
 func (s *Storage) LastModified(path string) time.Time {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 
 	if err != nil {
@@ -245,6 +254,8 @@ func (s *Storage) LastModified(path string) time.Time {
 // Url Get public URL of an object via path
 // Pattern URL `https://s3.<region>.wasabisys.com/<bucket>/<key>`
 func (s *Storage) Url(path string) string {
+	region := utils.Getenv("WS_REGION", "")
+	bucket := utils.Getenv("WS_BUCKET", "")
 
 	return fmt.Sprintf("https://%s.wasabisys.com/%s/%s",
 		region,
@@ -258,6 +269,8 @@ func (s *Storage) MakeDir(dir string) bool {
 }
 
 func (s *Storage) DeleteDir(dir string) bool {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	// Get all objects in dir
 	// Note: Can not delete a dir have children object.
 	objectCh := s.S3Client.ListObjects(context.TODO(), bucket, minio.ListObjectsOptions{
@@ -311,6 +324,8 @@ func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
 }
 
 func (s *Storage) getObject(path string) (*minio.Object, error) {
+	bucket := utils.Getenv("WS_BUCKET", "")
+
 	result, err := s.S3Client.GetObject(context.TODO(), bucket, path, minio.GetObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object %s. Here's why: %v\n", path, err)

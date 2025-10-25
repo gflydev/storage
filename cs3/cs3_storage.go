@@ -26,24 +26,20 @@ const (
 	Type = storage.Type("cs3")
 )
 
-var (
-	accessKey  = utils.Getenv("CS_ACCESS_KEY_ID", "")
-	secretKey  = utils.Getenv("CS_SECRET_ACCESS_KEY", "")
-	region     = utils.Getenv("CS_REGION", "")
-	bucket     = utils.Getenv("CS_BUCKET", "")
-	bucketCode = utils.Getenv("CS_BUCKET_CODE", "")
-	endPoint   = utils.Getenv("CS_ENDPOINT", "sin1.contabostorage.com")
-)
-
 // Endpoint returns the endpoint host without protocol scheme for minio client initialization.
 // The function strips both "https://" and "http://" prefixes from the endpoint string.
 func endpointURL() string {
+	endPoint := utils.Getenv("CS_ENDPOINT", "sin1.contabostorage.com")
+
 	// Strip protocol scheme from endpoint for minio client
 	return strings.TrimPrefix(strings.TrimPrefix(endPoint, "https://"), "http://")
 }
 
 // New Create S3 Storage with basics info.
 func New() *Storage {
+	accessKey := utils.Getenv("CS_ACCESS_KEY_ID", "")
+	secretKey := utils.Getenv("CS_SECRET_ACCESS_KEY", "")
+
 	// Initialize minio client object.
 	minioClient, err := minio.New(endpointURL(), &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
@@ -121,6 +117,8 @@ func (s *Storage) PutData(path string, contents []byte) bool {
 }
 
 func (s *Storage) PutFile(path string, fileSource *os.File) bool {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	_, err := s.S3Client.PutObject(context.TODO(), bucket, path, fileSource, -1, minio.PutObjectOptions{ContentType: core.MIMEOctetStream})
 
 	if err != nil {
@@ -133,6 +131,7 @@ func (s *Storage) PutFile(path string, fileSource *os.File) bool {
 }
 
 func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) bool {
+	bucket := utils.Getenv("CS_BUCKET", "")
 	fileSource, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Errorf("Unable to read file %q. Here's why: %v\n", filePath, err)
@@ -157,6 +156,7 @@ func (s *Storage) PutFilepath(path, filePath string, options ...interface{}) boo
 }
 
 func (s *Storage) Delete(path string) bool {
+	bucket := utils.Getenv("CS_BUCKET", "")
 	err := s.S3Client.RemoveObject(context.TODO(), bucket, path, minio.RemoveObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to delete file %q. Here's why: %v\n", path, err)
@@ -168,6 +168,8 @@ func (s *Storage) Delete(path string) bool {
 }
 
 func (s *Storage) Copy(from, to string) bool {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	srcOpts := minio.CopySrcOptions{
 		Bucket: bucket,
 		Object: from,
@@ -221,6 +223,8 @@ func (s *Storage) Get(path string) ([]byte, error) {
 }
 
 func (s *Storage) Size(path string) int64 {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object size from %v. Here's why: %v\n", path, err)
@@ -232,6 +236,8 @@ func (s *Storage) Size(path string) int64 {
 }
 
 func (s *Storage) LastModified(path string) time.Time {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	result, err := s.S3Client.StatObject(context.TODO(), bucket, path, minio.StatObjectOptions{})
 
 	if err != nil {
@@ -246,6 +252,10 @@ func (s *Storage) LastModified(path string) time.Time {
 // Url Get public URL of an object via path
 // Pattern URL `https://<region>.contabostorage.com/<bucket_code>:<bucket>/<key>`
 func (s *Storage) Url(path string) string {
+	bucket := utils.Getenv("CS_BUCKET", "")
+	region := utils.Getenv("CS_REGION", "")
+	bucketCode := utils.Getenv("CS_BUCKET_CODE", "")
+
 	return fmt.Sprintf("https://%s.contabostorage.com/%s:%s/%s",
 		region,
 		bucketCode,
@@ -259,6 +269,8 @@ func (s *Storage) MakeDir(dir string) bool {
 }
 
 func (s *Storage) DeleteDir(dir string) bool {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	// Get all objects in dir
 	// Note: Can not delete a dir have children object.
 	objectCh := s.S3Client.ListObjects(context.TODO(), bucket, minio.ListObjectsOptions{
@@ -312,6 +324,8 @@ func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
 }
 
 func (s *Storage) getObject(path string) (*minio.Object, error) {
+	bucket := utils.Getenv("CS_BUCKET", "")
+
 	result, err := s.S3Client.GetObject(context.TODO(), bucket, path, minio.GetObjectOptions{})
 	if err != nil {
 		log.Errorf("Unable to get object %s. Here's why: %v\n", path, err)
