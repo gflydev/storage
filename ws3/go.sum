@@ -16,6 +16,8 @@ github.com/gflydev/storage/local v1.1.5 h1:eSz496d2VGiWph4iPG7E52ZT3jcqs3I0Kbs+y
 github.com/gflydev/storage/local v1.1.5/go.mod h1:prfrORCqiIR3GuNMzU9AzlAcpiAh5qG8Y/IaH6DX6iw=
 github.com/gflydev/storage/local v1.1.6 h1:pilXfXfCutkxZnjFntwVYGILTHprTwRBbrbRPiW7yVc=
 github.com/gflydev/storage/local v1.1.6/go.mod h1:/z53fcDqnSqHbr4P4MRVu/NYHCyoAb6+x1Qw4mk/gw4=
+github.com/gflydev/storage/local v1.1.7 h1:ez4h89eGjeat9m75YcZGd3A7UKugMZEBJ2uzJG9CcM8=
+github.com/gflydev/storage/local v1.1.7/go.mod h1:kJosCQfk/UEi404pMO+wYqemUnmMVobOdS69XyazF/I=
 github.com/go-ini/ini v1.67.0 h1:z6ZrTEZqSWOTyH2FlglNbNgARyHG8oLW9gMELqKr06A=
 github.com/go-ini/ini v1.67.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/goccy/go-json v0.10.5 h1:Fq85nIqj+gXn/S5ahsiTlK3TmC85qgirsdTP/+DeaC4=

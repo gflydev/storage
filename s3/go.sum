@@ -46,6 +46,8 @@ github.com/gflydev/storage v1.1.6 h1:B/G+4nz+96bfpT0oPGpUaHHo2LYfM6vhi5m6Nd/3V60
 github.com/gflydev/storage v1.1.6/go.mod h1:lAsmPaCzQwdLycTZU4H6WFTR48WVyeB7vvLKZpyLoNU=
 github.com/gflydev/storage/local v1.1.6 h1:pilXfXfCutkxZnjFntwVYGILTHprTwRBbrbRPiW7yVc=
 github.com/gflydev/storage/local v1.1.6/go.mod h1:/z53fcDqnSqHbr4P4MRVu/NYHCyoAb6+x1Qw4mk/gw4=
+github.com/gflydev/storage/local v1.1.7 h1:ez4h89eGjeat9m75YcZGd3A7UKugMZEBJ2uzJG9CcM8=
+github.com/gflydev/storage/local v1.1.7/go.mod h1:kJosCQfk/UEi404pMO+wYqemUnmMVobOdS69XyazF/I=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/klauspost/compress v1.18.1 h1:bcSGx7UbpBqMChDtsF28Lw6v/G94LPrrbMbdC3JH2co=

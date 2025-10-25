@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/gflydev/core v1.17.11
 	github.com/gflydev/storage v1.1.6
-	github.com/gflydev/storage/local v1.1.6
+	github.com/gflydev/storage/local v1.1.7
 	github.com/minio/minio-go/v7 v7.0.95
 )
 

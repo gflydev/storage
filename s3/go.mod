@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.7
 	github.com/gflydev/core v1.17.11
 	github.com/gflydev/storage v1.1.6
-	github.com/gflydev/storage/local v1.1.6
+	github.com/gflydev/storage/local v1.1.7
 )
 
 require (
