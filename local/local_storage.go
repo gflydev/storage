@@ -2,7 +2,6 @@ package local
 
 import (
 	"fmt"
-	"github.com/gflydev/core/errors"
 	"github.com/gflydev/core/log"
 	"github.com/gflydev/core/utils"
 	"github.com/gflydev/storage"
@@ -12,6 +11,13 @@ import (
 	"strings"
 	"time"
 )
+
+// init auto-registers the local storage backend when the package is imported,
+// so a blank import (`_ "github.com/gflydev/storage/local"`) is enough to make
+// the "local" storage available via storage.Instance(), as documented in the README.
+func init() {
+	storage.Register(Type, New())
+}
 
 // ========================================================================================
 // 										Structure
@@ -207,7 +213,7 @@ func (s *Storage) Get(path string) ([]byte, error) {
 	// Stat returns file info. It will return an error if there is no file.
 	fileData, err := os.ReadFile(s.Path(path))
 	if err != nil {
-		log.Errorf("Unable read file %q. Here's why: %v\n", path)
+		log.Errorf("Unable read file %q. Here's why: %v\n", path, err)
 
 		return nil, err
 	}
@@ -298,7 +304,15 @@ func (s *Storage) Append(path, data string) bool {
 }
 
 // GetStream returns a stream (io.ReadCloser) for the object at the given path
-// This allows for efficient streaming without loading the entire file into memory
+// This allows for efficient streaming without loading the entire file into memory.
+// The caller is responsible for closing the returned reader.
 func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
-	return nil, errors.NotImplemented
+	file, err := os.Open(s.Path(path))
+	if err != nil {
+		log.Errorf("Unable to open file %q. Here's why: %v\n", path, err)
+
+		return nil, err
+	}
+
+	return file, nil
 }
