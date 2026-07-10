@@ -67,9 +67,10 @@ func (s *Storage) Put(path, contents string) bool {
 	localStorage := local.New()
 
 	// Put content to temporary dir at local.
-	fileName := filepath.Base(path)
-	tempPath := fmt.Sprintf("%s/%s", core.TempDir, fileName)
+	tempPath := tempFilePath(path)
 	localStorage.Put(tempPath, contents)
+	// Remove the temporary file once the upload is done.
+	defer removeTempFile(tempPath)
 
 	// Open file source
 	file, err := os.Open(filepath.Clean(tempPath))
@@ -94,9 +95,10 @@ func (s *Storage) PutData(path string, contents []byte) bool {
 	localStorage := local.New()
 
 	// Put content to temporary dir at local.
-	fileName := filepath.Base(path)
-	tempPath := fmt.Sprintf("%s/%s", core.TempDir, fileName)
+	tempPath := tempFilePath(path)
 	localStorage.PutData(tempPath, contents)
+	// Remove the temporary file once the upload is done.
+	defer removeTempFile(tempPath)
 
 	// Open file source
 	file, err := os.Open(filepath.Clean(tempPath))
@@ -217,6 +219,8 @@ func (s *Storage) Get(path string) ([]byte, error) {
 	body, err := io.ReadAll(result)
 	if err != nil {
 		log.Errorf("Unable read object body from %v. Here's why: %v\n", path, err)
+
+		return nil, err
 	}
 
 	return body, nil
@@ -317,10 +321,29 @@ func (s *Storage) Append(path, data string) bool {
 	return false
 }
 
-// GetStream returns a stream (io.ReadCloser) for the object at the given path
-// This allows for efficient streaming without loading the entire file into memory
+// GetStream returns a stream (io.ReadCloser) for the object at the given path.
+// This allows for efficient streaming without loading the entire file into memory.
+// The caller is responsible for closing the returned reader.
 func (s *Storage) GetStream(path string) (io.ReadCloser, error) {
-	return nil, errors.NotImplemented
+	return s.getObject(path)
+}
+
+// tempFilePath builds a collision-resistant local path used to buffer an object
+// before uploading it. Flattening the full object path (instead of using only its
+// base name) prevents two different objects that share a file name from clobbering
+// each other's temporary file during concurrent uploads.
+func tempFilePath(path string) string {
+	safe := strings.ReplaceAll(strings.TrimPrefix(filepath.ToSlash(path), "/"), "/", "_")
+
+	return fmt.Sprintf("%s/%d-%s", core.TempDir, os.Getpid(), safe)
+}
+
+// removeTempFile deletes a temporary upload buffer, ignoring a missing file and
+// logging any other failure so temp files are not leaked on disk.
+func removeTempFile(tempPath string) {
+	if err := os.Remove(filepath.Clean(tempPath)); err != nil && !os.IsNotExist(err) {
+		log.Errorf("Unable to remove temporary file %q. Here's why: %v\n", tempPath, err)
+	}
 }
 
 func (s *Storage) getObject(path string) (*minio.Object, error) {
